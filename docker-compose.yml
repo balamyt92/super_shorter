@@ -1,0 +1,61 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: ./docker/development
+      dockerfile: nginx.docker
+    volumes:
+      - ./app:/app
+    depends_on:
+      - php-fpm
+    ports:
+      - "8080:80"
+  php-fpm:
+    build:
+      context: ./docker/development
+      dockerfile: php-fpm.docker
+    volumes:
+      - ./app:/app
+    depends_on:
+      - mysql
+      - mailer
+  php-cli:
+    build:
+      context: ./docker/development
+      dockerfile: php-cli.docker
+    volumes:
+      - ./app:/app
+      - composer:/root/.composer/cache
+    depends_on:
+      - mysql
+      - mailer
+  node-watch:
+    image: node:11.13-alpine
+    volumes:
+      - ./app:/app
+    working_dir: /app
+    command: sh -c "until [ -f .ready ] ; do sleep 1 ; done && npm run watch"
+  node:
+    image: node:11.13-alpine
+    volumes:
+      - ./app:/app
+    working_dir: /app
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - mysql:/var/lib/mysql
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root"
+      - "MYSQL_USER=root"
+      - "MYSQL_PASSWORD=root"
+    ports:
+      - "33061:3306"
+
+  mailer:
+    image: mailhog/mailhog
+    ports:
+      - "8081:8025"
+
+volumes:
+  mysql:
+  composer:
