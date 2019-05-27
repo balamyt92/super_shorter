@@ -8,45 +8,74 @@
            href="/">
             SuperShorter
         </a>
-        <button class="navbar-toggler"
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbarsExampleDefault"
-                aria-controls="navbarsExampleDefault"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse"
-             id="navbarsExampleDefault">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link"
-                       href="/example">Example
-                        <span class="sr-only">(current)</span>
-                    </a>
-                </li>
-            </ul>
-        </div>
     </nav>
 
     <main role="main"
           class="container">
 
         <div class="starter-template">
-            <h1>Short your url!</h1>
-            <p class="lead">Just do it!</p>
-            <div class="input-group mb-3  input-group-lg">
-                <div class="input-group-prepend">
-                    <span class="input-group-text"
-                          id="basic-addon1">Long url
-                    </span>
+            <form action="{{ path('short-link') }}"
+                  data-host="http://localhost:8888/"
+                  data-stat="http://localhost:8888/stat/"
+                  class="js-shorter-form mb-5"
+                  method="post">
+                <h1>Short your url!</h1>
+                <p class="lead">Just do it!</p>
+                <div class="input-group mb-3  input-group-lg">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"
+                              id="basic-addon1">Long url
+                        </span>
+                    </div>
+                    <input name="url"
+                           type="url"
+                           class="form-control"
+                           aria-label="Long url">
                 </div>
-                <input type="text"
-                       class="form-control"
-                       aria-label="Long url"
-                       aria-describedby="basic-addon1">
+                <div class="input-group mb-3 input-group-sm">
+                    <button class="btn btn-light btn-sm"
+                            type="button"
+                            data-toggle="collapse"
+                            data-target="#collapseOptions"
+                            aria-expanded="false"
+                            aria-controls="collapseOptions">
+                        more
+                    </button>
+                </div>
+                <div class="collapse mt-3 mb-3"
+                     id="collapseOptions">
+                    <div class="card card-body">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">You custom short name</span>
+                            </div>
+                            <input class="form-control"
+                                   name="name"
+                                   type="text"
+                                   placeholder="my-short-link"
+                                   aria-label="You custom short name">
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Date to expire</span>
+                            </div>
+                            <input class="form-control"
+                                   type="date"
+                                   name="date"
+                                   min="{{ '+1day'|date('Y-m-d') }}"
+                                   aria-label="Date to expire">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg"
+                        type="submit">Short!
+                </button>
+            </form>
+            <div class="alert alert-success h-hidden js-success-alert"
+                 role="alert">
+            </div>
+            <div class="alert alert-danger h-hidden js-error-alert"
+                 role="alert">
             </div>
         </div>
 

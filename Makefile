@@ -27,13 +27,16 @@ composer-require:
 test:
 	docker-compose run --rm php-cli php bin/phpunit
 
-app-start: composer-install app-db-create app-assets-install app-migrations
+app-start: composer-install app-db-create app-assets-install assets-build app-migrations
 
 app-assets-install:
 	docker-compose run --rm node yarn install
 
 assets-watch:
 	docker-compose run --rm node yarn run watch
+
+assets-build:
+	docker-compose run --rm node yarn run build
 
 app-db-create:
 	docker-compose run --rm php-cli php bin/console doctrine:database:create --no-interaction
