@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Link;
-use App\Services\LinkSorterService;
+use App\Services\LinkShorterService;
 use App\Utils\LinkNameExistException;
 use App\Utils\LinkNameInvalidException;
 use App\Utils\LinkNameLongException;
@@ -28,20 +28,20 @@ class IndexController extends AbstractController
     /**
      * @Route("/short", name="short-link")
      *
-     * @param Request           $request
-     * @param LinkSorterService $linkSorter
+     * @param Request            $request
+     * @param LinkShorterService $linkSorter
      *
-     * @param LoggerInterface   $logger
+     * @param LoggerInterface    $logger
      *
      * @return JsonResponse
      */
-    public function short(Request $request, LinkSorterService $linkSorter, LoggerInterface $logger): JsonResponse
+    public function short(Request $request, LinkShorterService $linkSorter, LoggerInterface $logger): JsonResponse
     {
         try {
             $customName = $request->get('name');
             $url = $request->get('url');
             $fingerprint = $request->get('fingerprint');
-            $date = $request->get('date');
+            $expire_date = $request->get('expire_date');
 
             if (false === filter_var($url, FILTER_VALIDATE_URL)) {
                 return new JsonResponse([
@@ -51,7 +51,7 @@ class IndexController extends AbstractController
 
             if (!empty($customName)) {
                 try {
-                    $link = $linkSorter->generateByCustomName($url, $customName, $fingerprint, $date);
+                    $link = $linkSorter->generateByCustomName($url, $customName, $fingerprint, $expire_date);
                 } catch (LinkNameExistException $e) {
                     return new JsonResponse([
                         'message' => 'Не удалось создать ссылку - сокращение уже занято',
@@ -66,7 +66,7 @@ class IndexController extends AbstractController
                     ], 500);
                 }
             } else {
-                $link = $linkSorter->generate($url, $fingerprint, $date);
+                $link = $linkSorter->generate($url, $fingerprint, $expire_date);
             }
 
             if ($link) {
@@ -98,6 +98,6 @@ class IndexController extends AbstractController
             return $this->redirect($link->getSource(), 301);
         }
 
-        return $this->render('index/not-found.html.twig');
+        return $this->render('index/not-found.html.twig', [], new Response('', 404));
     }
 }

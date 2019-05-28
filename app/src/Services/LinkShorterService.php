@@ -6,9 +6,11 @@ use App\Entity\Link;
 use App\Utils\LinkNameExistException;
 use App\Utils\LinkNameInvalidException;
 use App\Utils\LinkNameLongException;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 
-class LinkSorterService
+class LinkShorterService
 {
     /**
      * @var EntityManagerInterface
@@ -25,17 +27,28 @@ class LinkSorterService
         $this->em = $em;
     }
 
-    public function generate(string $source, $fingerprint = null, $date = null): string
+    /**
+     * @param string            $source
+     * @param string            $fingerprint
+     * @param DateTimeImmutable $expire_at
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function generate(string $source, $fingerprint = null, $expire_at = null): string
     {
         // будем использовать базу как счетчик
         // для этого запишем сначала без укороченной ссылки что бы получить id
         // да это костыль
         // TODO: сделать выделенный каунтер в виде микросервиса :D
-        $link = new \App\Entity\Link();
+        $link = new Link();
         $link->setSource($source);
         $link->setShort((string)random_int(0, 10000));
-        $link->setCreateAt(new \DateTimeImmutable());
+        $link->setCreateAt(new DateTimeImmutable());
         $link->setUser($fingerprint);
+        if ($expire_at) {
+            $link->setExpireAt($expire_at);
+        }
         $this->em->persist($link);
         $this->em->flush();
 
@@ -50,16 +63,31 @@ class LinkSorterService
         return $short;
     }
 
+    /**
+     * @param int $prefix
+     * @param int $number
+     *
+     * @return string
+     * @throws Exception
+     */
     private function makeLink($prefix, $number): string
     {
         $codes_prefix = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         $prefix_str = $this->numberToStr($prefix, $codes_prefix);
-        // создаем илюзию рандома ссылки
+        // создаем иллюзию рандома ссылки
         $postfix_str = $this->numberToStr(random_int($number * 1000, ($number * 1000) + 999));
 
         return $prefix_str . $postfix_str;
     }
 
+    /**
+     * Перевод числа в другую систему исчисления на основе переданного словаря
+     *
+     * @param int|float $number
+     * @param string    $codes
+     *
+     * @return string
+     */
     private function numberToStr(
         $number,
         $codes = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -75,8 +103,12 @@ class LinkSorterService
         return $out;
     }
 
-    public function generateByCustomName($url, $customName, $fingerprint, $date = null): string
-    {
+    public function generateByCustomName(
+        string $url,
+        string $customName,
+        $fingerprint = null,
+        $expire_at = null
+    ): string {
         $repo = $this->em->getRepository(Link::class);
 
         if (mb_strlen($customName) > 100) {
@@ -98,7 +130,7 @@ class LinkSorterService
         $link = new Link();
         $link->setShort($customName);
         $link->setSource($url);
-        $link->setCreateAt(new \DateTimeImmutable());
+        $link->setCreateAt(new DateTimeImmutable());
         $link->setUser($fingerprint);
         $this->em->persist($link);
         $this->em->flush();
