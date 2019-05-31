@@ -32,10 +32,12 @@ class LinkShorterService
      * @param string            $fingerprint
      * @param DateTimeImmutable $expire_at
      *
+     * @param bool              $is_commercial
+     *
      * @return string
      * @throws Exception
      */
-    public function generate(string $source, $fingerprint = null, $expire_at = null): string
+    public function generate(string $source, $fingerprint = null, $expire_at = null, $is_commercial = false): string
     {
         // будем использовать базу как счетчик
         // для этого запишем сначала без укороченной ссылки что бы получить id
@@ -48,6 +50,9 @@ class LinkShorterService
         $link->setUser($fingerprint);
         if ($expire_at) {
             $link->setExpireAt($expire_at);
+        }
+        if ($is_commercial) {
+            $link->setIsCommercial($is_commercial);
         }
         $this->em->persist($link);
         $this->em->flush();
@@ -107,7 +112,8 @@ class LinkShorterService
         string $url,
         string $customName,
         $fingerprint = null,
-        $expire_at = null
+        $expire_at = null,
+        $is_commercial = false
     ): string {
         $repo = $this->em->getRepository(Link::class);
 
@@ -132,9 +138,33 @@ class LinkShorterService
         $link->setSource($url);
         $link->setCreateAt(new DateTimeImmutable());
         $link->setUser($fingerprint);
+        if (null !== $expire_at) {
+            $link->setExpireAt(new DateTimeImmutable($expire_at));
+        }
+        if ($is_commercial) {
+            $link->setIsCommercial($is_commercial);
+        }
+
         $this->em->persist($link);
         $this->em->flush();
 
         return $link->getShort();
+    }
+
+    public function getCommercialImage($path): string
+    {
+        $image = null;
+
+        $directory = new \RecursiveDirectoryIterator($path);
+        $iterator = new \RecursiveIteratorIterator($directory);
+        $files = [];
+        foreach ($iterator as $info) {
+            if (!$info->isDir()) {
+                $files[] = $info->getFilename();
+            }
+        }
+        shuffle($files);
+
+        return $files[0];
     }
 }

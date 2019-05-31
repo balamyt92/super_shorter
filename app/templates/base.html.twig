@@ -11,8 +11,8 @@
     </head>
     <body>
         {% block body %}{% endblock %}
+        <script src="{{ asset('build/vendors~app~fingerprint.js') }}"></script>
         <script src="{{ asset('build/vendors~app.js') }}"></script>
-        <script src="{{ asset('build/runtime.js') }}"></script>
         <script src="{{ asset('build/app.js') }}"></script>
         {% block javascripts %}{% endblock %}
     </body>

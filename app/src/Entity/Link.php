@@ -41,6 +41,11 @@ class Link
      */
     private $expire_at;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $is_commercial;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -94,6 +99,11 @@ class Link
         return $this;
     }
 
+    public function hasActive(): bool
+    {
+        return null === $this->getExpireAt() || $this->getExpireAt()->getTimestamp() < time();
+    }
+
     public function getExpireAt(): ?\DateTimeImmutable
     {
         return $this->expire_at;
@@ -102,6 +112,18 @@ class Link
     public function setExpireAt(?\DateTimeImmutable $expire_at): self
     {
         $this->expire_at = $expire_at;
+
+        return $this;
+    }
+
+    public function getIsCommercial(): ?bool
+    {
+        return $this->is_commercial;
+    }
+
+    public function setIsCommercial(?bool $isCommercial): self
+    {
+        $this->is_commercial = $isCommercial;
 
         return $this;
     }

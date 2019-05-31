@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello StatisticController!{% endblock %}
+
+{% block body %}
+    <main role="main"
+          class="container">
+        <div class="starter-template">
+            <h1>
+                Statistic for the link
+                <a href="{{ short_link }}">{{ short_link }}✅</a>
+            </h1>
+
+            <h2>Uniq users in last 14 days {{ uniq_users }}</h2>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">User</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for k, item in items %}
+                    <tr>
+                        <th scope="row">{{ k + 1 }}</th>
+                        <td>{{ item.date|date }}</td>
+                        <td>{{ item.fingerprint }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+{% endblock %}

@@ -15,8 +15,8 @@
 
         <div class="starter-template">
             <form action="{{ path('short-link') }}"
-                  data-host="http://localhost:8888/"
-                  data-stat="http://localhost:8888/stat/"
+                  data-host="{{ domain_link }}/"
+                  data-stat="{{ domain_link }}/statistic/"
                   class="js-shorter-form mb-5"
                   method="post">
                 <h1>Short your url!</h1>
@@ -65,8 +65,22 @@
                                    min="{{ '+1day'|date('Y-m-d') }}"
                                    aria-label="Date to expire">
                         </div>
+                        <div class="input-group mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       value="1"
+                                       name="commercial"
+                                       aria-label="Is commercial link"
+                                       id="defaultCheck1">
+                                <label class="form-check-label"
+                                       for="defaultCheck1">Is commercial link</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <input type="hidden"
+                       name="fingerprint">
                 <button class="btn btn-primary btn-lg"
                         type="submit">Short!
                 </button>
@@ -76,6 +90,13 @@
             </div>
             <div class="alert alert-danger h-hidden js-error-alert"
                  role="alert">
+            </div>
+
+            <div class="js-old-links h-hidden">
+                <h2>Your links</h2>
+                <ul class="list-group">
+                    <li class="list-group-item"></li>
+                </ul>
             </div>
         </div>
 

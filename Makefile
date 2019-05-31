@@ -27,7 +27,7 @@ composer-require:
 test:
 	docker-compose run --rm php-cli php bin/phpunit
 
-app-start: composer-install app-db-create app-assets-install assets-build app-migrations
+app-start: composer-install app-assets-install assets-build app-db-create app-migrations
 
 app-assets-install:
 	docker-compose run --rm node yarn install
@@ -36,11 +36,14 @@ assets-watch:
 	docker-compose run --rm node yarn run watch
 
 assets-build:
-	docker-compose run --rm node yarn run build
+	docker-compose run --rm node yarn run dev
 
 app-db-create:
-	docker-compose run --rm php-cli php bin/console doctrine:database:create --no-interaction
+	docker-compose run --rm php-cli php bin/console doctrine:database:create --no-interaction --if-not-exists
 
 app-migrations:
 	docker-compose run --rm php-cli php bin/console doctrine:migrations:migrate --no-interaction
+
+app-cache-clear:
+	docker-compose run --rm php-cli php bin/console cache:clear
 
