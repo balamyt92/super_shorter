@@ -1,5 +1,5 @@
 up: docker-up
-init: docker-down-clear docker-pull docker-build docker-up app-start
+init: docker-down-clear docker-pull docker-build docker-up
 bash:
 	docker-compose run --rm php-cli bash
 
