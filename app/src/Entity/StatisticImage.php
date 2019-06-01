@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\StatisticImageRepository")
+ * @ORM\Table(indexes={@Index(name="image_idx", columns={"image"})})
  */
 class StatisticImage
 {

@@ -22,7 +22,7 @@ composer-install:
 	docker-compose run --rm php-cli composer install
 
 composer-require:
-	docker-compose run --rm php-cli composer require ${ARGS}
+	docker-compose run --rm php-cli composer require $(filter-out $@,$(MAKECMDGOALS))
 
 test:
 	docker-compose run --rm php-cli php bin/phpunit

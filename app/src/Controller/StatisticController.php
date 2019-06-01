@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Link;
+use App\Entity\StatisticImage;
 use App\Entity\StatisticLink;
 use App\Services\StatisticService;
+use DateTimeImmutable;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,7 +23,7 @@ class StatisticController extends AbstractController
      * @param Request $request
      *
      * @return Response
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
     public function index($slug, Request $request): Response
     {
@@ -31,10 +34,14 @@ class StatisticController extends AbstractController
         }
 
         $repo = $doctrine->getRepository(StatisticLink::class);
-        $statisticItems = $repo->findBy(['link' => $link->getId()], [], 50);
+        // TODO: pagination
+        $statisticItems = $repo->findBy(['link' => $link->getId()], ['date' => 'DESC'], 50);
+
         $uniq_users = $repo->createQueryBuilder('s')
             ->select('count(DISTINCT s.fingerprint)')
-//            ->where('s.date BETWEEN DATE_SUB(NOW(),INTERVAL 14 DAY) and DATE_SUB(NOW(),INTERVAL 1 DAY)')
+            ->where('s.date BETWEEN :date and :now')
+            ->setParameter('date', new DateTimeImmutable('-14 days'))
+            ->setParameter('now', new DateTimeImmutable('now'))
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -47,7 +54,7 @@ class StatisticController extends AbstractController
     }
 
     /**
-     * @Route("/statistic/add/image", name="statistic_image_showed", methods={"POST"})
+     * @Route("/statistic/image/add", name="statistic_image_showed", methods={"POST"})
      *
      * @param Request          $request
      * @param StatisticService $statisticService
@@ -69,5 +76,26 @@ class StatisticController extends AbstractController
         return new JsonResponse([
             'message' => 'Неверный запрос',
         ], 500);
+    }
+
+    /**
+     * @Route("/statistic/image/show", name="statistic_image")
+     *
+     * @return Response
+     */
+    public function image(): Response
+    {
+        $doctrine = $this->getDoctrine();
+        $repo = $doctrine->getRepository(StatisticImage::class);
+
+        $items = $repo->createQueryBuilder('t')
+            ->select('t.image as image, count(t.image) as count')
+            ->groupBy('t.image')
+            ->getQuery()
+            ->getArrayResult();
+
+        return $this->render('statistic/images.html.twig', [
+            'items' => $items,
+        ]);
     }
 }

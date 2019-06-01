@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LinkRepository")
+ * @ORM\Table(indexes={@Index(name="link_idx", columns={"short"})})
  */
 class Link
 {
@@ -22,7 +24,7 @@ class Link
     private $source;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=100, unique=true)
      */
     private $short;
 
@@ -101,7 +103,7 @@ class Link
 
     public function hasActive(): bool
     {
-        return null === $this->getExpireAt() || $this->getExpireAt()->getTimestamp() < time();
+        return null === $this->getExpireAt() || $this->getExpireAt()->getTimestamp() > time();
     }
 
     public function getExpireAt(): ?\DateTimeImmutable

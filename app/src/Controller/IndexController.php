@@ -8,6 +8,7 @@ use App\Services\StatisticService;
 use App\Utils\LinkNameExistException;
 use App\Utils\LinkNameInvalidException;
 use App\Utils\LinkNameLongException;
+use Doctrine\DBAL\DBALException;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

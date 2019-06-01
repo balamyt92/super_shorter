@@ -29,7 +29,6 @@ $(function () {
             if (old_url === $urlInput.val()) {
                 return false;
             }
-            old_url = $urlInput.val();
 
             let data = new FormData($shorter_form[0]);
             let xhr = new XMLHttpRequest();
@@ -39,6 +38,7 @@ $(function () {
             xhr.onload = function () {
                 try {
                     if (this.status >= 200 && this.status < 400) {
+                        old_url = $urlInput.val();
                         renderSuccess(JSON.parse(this.response))
                     } else {
                         renderError(JSON.parse(this.response));
@@ -81,7 +81,7 @@ $(function () {
                 renderSpan.text(Math.floor((distance - countdown) / 1000));
             }, 200);
 
-            $.post('/statistic/add/image', {
+            $.post('/statistic/image/add', {
                 image: $commercial.data('image')
             });
         });
@@ -97,7 +97,6 @@ $(function () {
                     statistic_link = makeStatisticLink(old_link[oldLinkKey]);
                 html += `<li class="list-group-item"><a href="${link}" target="_blank">${link}</a> (<a href="${statistic_link}">statistic</a>)</li>`;
             }
-            console.log($old_link);
             $old_link.find('ul').html(html);
             $old_link.show();
         }
